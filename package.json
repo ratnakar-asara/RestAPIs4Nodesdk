@@ -2,14 +2,16 @@
   "name": "balance-transfer",
   "version": "0.0.1",
   "description": "A balance-transfer example node program to demonstrate using NodeSDK apis with alpha based fabric images",
-  "main": "app/app.js",
+  "scripts": {
+    "start": "DEBUG=hfc node web/server/SimpleApp.js"
+  },
   "keywords": [
     "fabric-client sample app",
     "balance-transfer node sample",
     "v1.0 fabric nodesdk sample"
   ],
   "engines": {
-    "node": ">=6.9.5",
+    "node": ">=6.9.1",
     "npm": ">=3.10.10"
   },
   "license": "Apache-2.0",
@@ -20,8 +22,8 @@
     "express": "^4.15.2",
     "express-jwt": "^5.1.0",
     "express-session": "^1.15.2",
-    "fabric-ca-client": ">=1.0.0-alpha <1.0.0-alpha.10",
-    "fabric-client": ">=1.0.0-alpha <1.0.0-alpha.10",
+    "fabric-ca-client": "1.0.0-alpha2",
+    "fabric-client": "1.0.0-alpha2",
     "log4js": "^0.6.38",
     "winston": "^2.2.0",
     "jsonwebtoken": "^7.3.0"

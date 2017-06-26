@@ -1,0 +1,160 @@
+{
+    "__orderer": {
+        "__url": "grpcs://orderer.example.com:7050",
+        "url": "grpc://orderer.example.com:7050",
+        "ssl_target_name_override": "orderer.example.com",
+        "orderer_tls_cacerts_path": "../../generated-artifacts/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt"
+    },
+    "organizations": {
+        "orderer": {
+            "name": "orderer",
+            "mspid": "OrdererOrg",
+            "__ca": "the orderer doesn't have its own CA service -- is this a problem?",
+            "ca": null,
+            "orderers": {
+                "orderer.example.com": {
+                    "remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "orderer.example.com",
+                        "port": 7050
+                    },
+                    "ssl_target_name_override": "orderer.example.com",
+                    "orderer_tls_cacerts_path": "../../generated-artifacts/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt"
+                }
+            },
+            "peers": {
+            },
+            "users": {
+                "Admin": {
+                    "msp_path": "../../generated-artifacts/crypto-config/ordererOrganizations/example.com/users/Admin@example.com/msp",
+                    "tls_path": "../../generated-artifacts/crypto-config/ordererOrganizations/example.com/users/Admin@example.com/tls"
+                }
+            }
+        },
+        "org0": {
+            "name": "org0",
+            "mspid": "Org0MSP",
+            "ca": {
+                "remote": {
+                    "protocol": "http",
+                    "host": "ca.org0.example.com",
+                    "port": 7054
+                },
+                "tlsOptions": {
+                    "trustedRoots": "../../generated-artifacts/crypto-config/peerOrganizations/org0.example.com/ca/ca.org0.example.com-cert.pem",
+                    "verify": true
+                },
+                "caname": null
+            },
+            "orderers": {
+            },
+            "peers": {
+                "peer0.org0.example.com": {
+                    "requests_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer0.org0.example.com",
+                        "port": 7051
+                    },
+                    "events_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer0.org0.example.com",
+                        "port": 7053
+                    },
+                    "ssl_target_name_override": "peer0.org0.example.com",
+                    "peer_tls_cacerts_path": "../../generated-artifacts/crypto-config/peerOrganizations/org0.example.com/peers/peer0.org0.example.com/tls/ca.crt"
+                },
+                "peer1.org0.example.com": {
+                    "requests_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer1.org0.example.com",
+                        "port": 7051
+                    },
+                    "events_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer1.org0.example.com",
+                        "port": 7053
+                    },
+                    "ssl_target_name_override": "peer1.org0.example.com",
+                    "peer_tls_cacerts_path": "../../generated-artifacts/crypto-config/peerOrganizations/org0.example.com/peers/peer1.org0.example.com/tls/ca.crt"
+                }
+            },
+            "users": {
+                "Admin": {
+                    "msp_path": "../../generated-artifacts/crypto-config/peerOrganizations/org0.example.com/users/Admin@org0.example.com/msp",
+                    "tls_path": "../../generated-artifacts/crypto-config/peerOrganizations/org0.example.com/users/Admin@org0.example.com/tls"
+                },
+                "User1": {
+                    "msp_path": "../../generated-artifacts/crypto-config/peerOrganizations/org0.example.com/users/User1@org0.example.com/msp",
+                    "tls_path": "../../generated-artifacts/crypto-config/peerOrganizations/org0.example.com/users/User1@org0.example.com/tls"
+                }
+            }
+        },
+        "org1": {
+            "name": "org1",
+            "mspid": "Org1MSP",
+            "ca": {
+                "remote": {
+                    "protocol": "http",
+                    "host": "ca.org1.example.com",
+                    "port": 7054
+                },
+                "tlsOptions": {
+                    "trustedRoots": "../../generated-artifacts/crypto-config/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem",
+                    "verify": true
+                },
+                "caname": null
+            },
+            "orderers": {
+            },
+            "peers": {
+                "peer0.org1.example.com": {
+                    "requests_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer0.org1.example.com",
+                        "port": 7051
+                    },
+                    "events_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer0.org1.example.com",
+                        "port": 7053
+                    },
+                    "ssl_target_name_override": "peer0.org1.example.com",
+                    "peer_tls_cacerts_path": "../../generated-artifacts/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
+                },
+                "peer1.org1.example.com": {
+                    "requests_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer1.org1.example.com",
+                        "port": 7051
+                    },
+                    "events_remote": {
+                        "protocol": "grpc",
+                        "__protocol": "grpcs",
+                        "host": "peer1.org1.example.com",
+                        "port": 7053
+                    },
+                    "ssl_target_name_override": "peer1.org1.example.com",
+                    "peer_tls_cacerts_path": "../../generated-artifacts/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt"
+                }
+            },
+            "users": {
+                "Admin": {
+                    "msp_path": "../../generated-artifacts/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+                    "tls_path": "../../generated-artifacts/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls"
+                },
+                "User1": {
+                    "msp_path": "../../generated-artifacts/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp",
+                    "tls_path": "../../generated-artifacts/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/tls"
+                }
+            }
+        }
+    }
+}

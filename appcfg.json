@@ -1,0 +1,44 @@
+{
+    "host":"webserver",
+    "port":"4000",
+    "GOPATH":"../../source-artifacts/gopath",
+    "kvs_path_prefix":"/tmp/Fabric_SampleWebApp/kvs/organization/",
+    "cryptoSuite_path_prefix":"/tmp/Fabric_SampleWebApp/cryptoSuite/",
+    "eventWaitTime":"30000",
+    "channels": {
+        "mychannel": {
+            "configtx_path": "../../generated-artifacts/mychannel.tx",
+            "chaincode": {
+                "id": "mycc",
+                "version": "v0",
+                "path": "github.com/example_cc"
+            },
+            "channel_creator_spec": {
+                "organization_name": "org0",
+                "user_name": "Admin"
+            },
+            "__TODO:": "In theory there could be multiple orderers, but this doesn't appear to be supported in fabric-sdk-node yet, so for now, must have only 1",
+            "participating_orderer_organizations": {
+                "orderer": [
+                    "orderer.example.com"
+                ]
+            },
+            "participating_peer_organizations": {
+                "org0": {
+                    "channel_joiner_user_name": "Admin",
+                    "peers": [
+                        "peer0.org0.example.com",
+                        "peer1.org0.example.com"
+                    ]
+                },
+                "org1": {
+                    "channel_joiner_user_name": "Admin",
+                    "peers": [
+                        "peer0.org1.example.com",
+                        "peer1.org1.example.com"
+                    ]
+                }
+            }
+        }
+    }
+}
