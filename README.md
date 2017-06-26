@@ -1,284 +1,148 @@
-# Alpha based Sample app using NodeSDK apis
+# Hyperledger Fabric Example App using node.js SDK
 
-### Clone this repo
+This is a fork of https://github.com/ratnakar-asara/Fabric_SampleWebApp
 
-```
-git clone https://github.com/ratnakar-asara/RestAPIs4Nodesdk
-```
+## Instructions
 
-### A script to spin the local network and installs node modules also start the app @ port 4000
+Clone this repo with the following command.
 
-```
-cd RestAPIs4Nodesdk
-./runApp.sh
-```
+    git clone https://github.com/vdods/Fabric_SampleWebApp.git
 
-You will see the below log when app started
-```
-info: ****************** SERVER STARTED ************************
-info: **************  http://localhost:4000  ******************
-```
+In one terminal, spin up the peer network, orderer, certificate authorities, and web server (which hosts the web app).
 
-### How to execute the requests
+    make up
 
-#### using PostMan
+Once you see the following in the services log, the web server is ready to process requests.
 
-Imort the following link in your PostMan 
-https://www.getpostman.com/collections/c67f15e1e9da14b31ffd
+    info: ****************** SERVER STARTED ************************
+    info: **************  http://localhost:4000  ******************
 
-	
--------------------------- OR -------------------------- 
+In another terminal, execute the test script which issues HTTP requests using `curl` against the REST API offered by the web app.
 
-#### using cURL from command line
+    ./testAPIs.sh
 
-##### 1. Enroll Users:
-*Org1*
+The script should run to completion and exit without error (return code should be 0).
 
-```
-curl -X POST \
-  http://localhost:4000/users \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/x-www-form-urlencoded' \
-  -d 'username=sam&password=secret&orgName=org1'
+## Structure Of Project
 
-```
+TODO document
+-   Project structure
+-   What are source files
+-   What are generated
+-   docker-compose volumes
 
-*Org2*
+## Finer-grained Instructions
 
-```
-curl -X POST \
-  http://localhost:4000/users \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/x-www-form-urlencoded' \
-  -d 'username=sam&password=secret&orgName=org2'
-```
+There are several `make` targets that make controlling the docker-compose services defined in `docker-compose.yaml`
+easier.
 
-##### 2. Create Channel
+-   The command
 
-```
-curl -X POST \
-  http://localhost:4000/channels \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -d '{
-        "channelName":"mychannel",
-        "channelConfigPath":"../artifacts/channel/mychannel.tx"
-}'
+        make all-generated-artifacts
 
-```
+    will ensure that the following artifacts are generated:
+    -   Cryptographic materials in `generated-artifacts/crypto-config`
+    -   Configuration transaction in `generated-artifacts/mychannel.tx`
+    -   Orderer genesis block in `generated-artifacts/orderer.genesis.block`
 
-##### 3. Join Channel
+    The `generated-artifacts` directory contains all generated artifacts and only generated artifacts (no source artifacts),
+    and therefore can be entirely deleted without worry.
 
-*Org1*
+-   The command
 
-```
-curl -X POST \
-  http://localhost:4000/channels/mychannel/peers \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -d '{
-        "peers": ["localhost:7051","localhost:7056"]
-}'
+        make rm-generated-artifacts
 
-```
+    will delete all generated artifacts.  In particular, it will delete the entire `generated-artifacts` directory.
 
-*Org2*
+-   The command
 
-```
-curl -X POST \
-  http://localhost:4000/channels/mychannel/peers \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJpbmgiLCJvcmdOYW1lIjoib3JnMiIsImlhdCI6MTQ5MjM5OTcwNH0.iMDVFsE8viKCRwg_VuHuJN5-E1Va6Gem_3pblL1Wb0s' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJpbmgiLCJvcmdOYW1lIjoib3JnMiIsImlhdCI6MTQ5MjM5OTcwNH0.iMDVFsE8viKCRwg_VuHuJN5-E1Va6Gem_3pblL1Wb0s' \
-  -d '{
-        "peers": ["localhost:8051","localhost:8056"]
-}'
+        make up
 
-```
+    ensures that all necessary artifacts are generated (into the `generated-artifacts` subdir), and creates and starts all
+    services, volumes, and networks and prints all services' logs to the console.  Hitting Ctrl+C in this mode
+    will stop all services.  If any container exits, all will exit.  There are three volumes:
+    -   `fabric_samplewebapp_webserver_homedir` : Stores the home directory of the user that runs the web server.  In particular, this
+        stores the `~/.hfc-key-store` directory.
+    -   `fabric_samplewebapp_webserver_homedir_node_modules` : Stores the `node_modules` directory for the web server.  This will really
+        only be populated once and won't need updating often, nor does it typically need to be deleted before restarting the
+        web server.
+    -   `fabric_samplewebapp_webserver_tmp` : Stores the key/value store for each organization in the network.
 
-##### 4. install chaincode
+-   The command
 
-*Org1*
+        make up-detached
 
-```
-curl -X POST \
-  http://localhost:4000/chaincodes \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -d '{
-        "peers": ["localhost:7051","localhost:7056"],
-        "chaincodeName":"mycc",
-        "chaincodePath":"github.com/example_cc",
-        "chaincodeVersion":"v0"
-}'
-```
+    does the same as `make up` except that it spins up all services in the background and does not print logs to the console.
 
-*Org2*
+-   The command
 
-```
-curl -X POST \
-  http://localhost:4000/chaincodes \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJpbmgiLCJvcmdOYW1lIjoib3JnMiIsImlhdCI6MTQ5MjM5OTcwNH0.iMDVFsE8viKCRwg_VuHuJN5-E1Va6Gem_3pblL1Wb0s' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJpbmgiLCJvcmdOYW1lIjoib3JnMiIsImlhdCI6MTQ5MjM5OTcwNH0.iMDVFsE8viKCRwg_VuHuJN5-E1Va6Gem_3pblL1Wb0s' \
-  -d '{
-        "peers": ["localhost:8051","localhost:8056"],
-        "chaincodeName":"mycc",
-        "chaincodePath":"github.com/example_cc",
-        "chaincodeVersion":"v0"
-}'
-```
+        make logs-follow
 
-##### 5. Instantiate chaincode
-Instantiate chaincode on peer1 of Org1
+    can be used voluntarily, in the case that `make up-detached` was used, to follow the services' log printouts.
+    Hitting Ctrl+C will detach from the log printout but not stop the services.
 
-```
-curl -X POST \
-  http://localhost:4000/channels/mychannel/chaincodes \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -d '{
-        "peers": ["localhost:7051"],
-        "chaincodeName":"mycc",
-        "chaincodePath":"github.com/example_cc",
-        "chaincodeVersion":"v0",
-        "functionName":"init",
-        "args":["a","100","b","200"]
-}'
-```
+-   The command
 
-##### 6. Invoke chaincode
+        make down
 
-Invoke on chaincode on peer1 of Org1
+    brings down all services, but do not delete any volumes (i.e. docker-based persistent storage).
 
-```
-curl -X POST \
-  http://localhost:4000/channels/mychannel/chaincodes/mycc \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -d '{
-        "peers": ["localhost:7051"],
-        "chaincodeVersion":"v0",
-        "functionName":"invoke",
-        "args":["move","a","b","10"]
-}'
-```
+-   The command
 
-**NOTE**: Save the output (TransactionID) of this command, The same can be used when querying transactions by ID
+        make down-full
 
-##### 7. Query chaincode
+    brings down all services and delete all volumes.  This clears all state (of peers, orderer, CAs, web server, etc).
 
-Query on chaincode on peer1 of Org1
+-   The command
 
-```
-curl -X GET \
-  'http://localhost:4000/channels/mychannel/chaincodes/mycc?peer=peer1&args=%5B%22query%22%2C%22a%22%5D&chaincodeVersion=v0' \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
-```
+        make rm-state-volumes
 
-##### 8. Query Block by BlockNumber
+    deletes the persistent storage of the web server (in particular, the `fabric_samplewebapp_webserver_tmp` and
+    `fabric_samplewebapp_webserver_homedir` volumes), and can be used for example to reset the web server to a 'clean'
+    state, not having anything in the key/value store(s).  This can be executed only if the services are not up.
 
-Fetch Block details by Blocknumber
+-   The command
 
-```
-curl -X GET \
-  'http://localhost:4000/channels/mychannel/blocks/1?participatingPeer=peer1' \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
-```
+        make rm-node-modules
 
-##### 9. Query Transaction by Transaction ID
+    deletes the node_modules directory of the web server (in particular, the `fabric_samplewebapp_webserver_homedir_node_modules` volume).
+    This can be executed only if the services are not up.
 
-**NOTE:** Use the transaction ID from any of the previous transactions
+-   And finally,
 
-```
-curl -X GET http://localhost:4000/channels/mychannel/transactions/<Use_transaction-ID>?participatingPeer=peer1 \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
-```
+        make down && make rm-state-volumes && make up
 
-##### 10. Query Block by Hash
+    is a convenient single command you can use after stopping services to reset all services back to a clean state
+    and restart them, following the services' logs.  There is typically no need to delete `node_modules` because
+    it is not likely to qualitatively change or be corrupted (though that does happen sometimes during development
+    for various reasons).  Note that the web server service in `docker-compose.yaml` does execute the
+    command `npm install`, so any updates to `package.json` should automatically take effect.
 
-**NOTE:** Change the following command by including the Block hash value
+## Random Notes
 
-```
-curl -X GET \
-  'http://localhost:4000/channels/mychannel/blocks?hash=<HASH_VALUE_HERE>&participatingPeer=peer1' \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
-```
-##### 11. Query Channel Information
+-   There is a bit of a hack in `docker-compose.yaml` in order to retrieve the private key filename in various situations.
+    This is done by specifying
 
-```
-curl -X GET \
-  'http://localhost:4000/channels/mychannel?participatingPeer=peer1' \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
-```
+        --ca.keyfile `ls -1 /etc/hyperledger/fabric-ca-server-config/*_sk`
 
-##### 12. Query Installed chaincodes
+    in the command to start each CA service.  If there is more than one file in that directory matching the `*_sk` pattern,
+    then this will cause the CA (in this case, `ca.org1.example.com`) to stop with error
 
-```
-curl -X GET \
-  'http://localhost:4000/chaincodes?hostingPeer=peer1&installed=true' \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
+        ca.org1.example.com       | 2017/06/01 19:31:53 [INFO] Created default configuration file at /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+        ca.org1.example.com       | Error: Usage: too many arguments.
+        ca.org1.example.com       | Usage:
+        ca.org1.example.com       |   fabric-ca-server start [flags]
 
-```
+    This can occur if for some reason the cryptographic materials are generated (via rules in Makefile) more than once.
+    The solution is to delete the cryptographic materials so they can be regenerated from scratch.  This can be done
+    conveniently via the command
 
-##### 13. Query Instantiated chaincodes
+        make rm-generated-artifacts
 
-```
-curl -X GET \
-  'http://localhost:4000/chaincodes?hostingPeer=peer1&installed=false' \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
-```
+    No explicit command is necessary to regenerate them for running the docker-compose services, as the `make up` command
+    will generate them automatically.  However, they can be generated via the command
 
-##### 14. Query for all Channels
-
-```
-curl -X GET \
-  'http://localhost:4000/channels?participatingPeer=peer1' \
-  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo' \
-  -H 'cache-control: no-cache' \
-  -H 'content-type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhbSIsIm9yZ05hbWUiOiJvcmcxIiwiaWF0IjoxNDkyMzk3OTg5fQ.zMvr5AoksMgJr0yT42N_uy8KhD4d8j5qOfVWkpJfgXo'
-```
--------------------------- OR -------------------------- 
-
-#### script
-
-Run the script **testAPIs.sh** after starting the network and app
-
-```
-./testAPIs.sh
-```
-**NOTE**: Script fails at queryBlockByHash
+        make all-generated-artifacts
+-   TODO: Make a separate directory of artifacts for use by the web server.  There should be a very clear
+    demarcation between the artifacts directories for each logical server (e.g. peer, orderer, ca, webserver).
+-   TODO: Get orderer TLS working.  Currently it fails within the grpc node module in the Orderer.sendBroadcast call.
