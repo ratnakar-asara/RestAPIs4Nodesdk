@@ -1,0 +1,19 @@
+version: '2'
+services:
+
+  ca-base:
+    image: hyperledger/fabric-ca:x86_64-1.0.1
+    environment:
+      # This is the path to the persistent storage for the CA.
+      - FABRIC_CA_HOME=/var/hyperledger/ca
+      - FABRIC_CA_LOGGING_LEVEL=$GENERAL_LOGGING_LEVEL
+
+      - FABRIC_CA_SERVER_TLS_ENABLED=$TLS_ENABLED
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/var/hyperledger/ca/tls/server.crt
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/var/hyperledger/ca/tls/server.key
+    command: |
+        bash -cx "
+            find /var/hyperledger/ca
+            fabric-ca-server start --boot ignore:ignore --config /var/hyperledger/ca/fabric-ca-server-config.yaml
+        "
+

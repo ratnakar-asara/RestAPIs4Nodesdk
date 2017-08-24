@@ -1,0 +1,25 @@
+<!-- <div class='demo-member-panel-top' style='flex-grow:1;'> -->
+<div class='vertical-layout'>
+    <div>Currently Using Account: <span ng-bind='context.account_name'></span></div>
+    <div>Balance: <span ng-bind='context.balance'></span></div>
+    <div>Invoke Actions:</div>
+    <div>
+        <input type='text' ng-model='context.create_account__account_name' placeholder='Account Name'>
+        <input type='text' ng-model='context.create_account__initial_balance' placeholder='Initial Balance'>
+        <button ng-click='context.parent.create_account(context.create_account__account_name, context.create_account__initial_balance)'>Create Account</button>
+    </div>
+    <div>
+        <input type='text' ng-model='context.delete_account__account_name' placeholder='Account Name'>
+        <button ng-click='context.parent.delete_account(context.delete_account__account_name)'>Delete Account</button>
+    </div>
+    <div>
+        <input type='text' ng-model='context.transfer__from_account_name' placeholder='From Account Name'>
+        <input type='text' ng-model='context.transfer__to_account_name' placeholder='To Account Name'>
+        <input type='text' ng-model='context.transfer__amount' placeholder='Amount'>
+        <button ng-click='context.parent.transfer(context.transfer__from_account_name, context.transfer__to_account_name, context.transfer__amount)'>Transfer</button>
+    </div>
+    <div>
+        <input type='text' ng-model='context.query_balance__account_name' placeholder='Account Name'>
+        <button ng-click='context.parent.query_balance(context.query_balance__account_name)'>Query Balance</button>
+    </div>
+</div>

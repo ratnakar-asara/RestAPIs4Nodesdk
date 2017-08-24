@@ -1,0 +1,44 @@
+version: '2'
+services:
+
+  peer-base:
+    image: hyperledger/fabric-peer:x86_64-1.0.1
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/peer
+      - CORE_LOGGING_PEER=$GENERAL_LOGGING_LEVEL
+      #- CORE_LOGGING_CAUTHDSL=$GENERAL_LOGGING_LEVEL
+      #- CORE_LOGGING_GOSSIP=$GENERAL_LOGGING_LEVEL
+      #- CORE_LOGGING_LEDGER=$GENERAL_LOGGING_LEVEL
+      #- CORE_LOGGING_MSP=$GENERAL_LOGGING_LEVEL
+      #- CORE_LOGGING_POLICIES=$GENERAL_LOGGING_LEVEL
+      #- CORE_LOGGING_GRPC=$GENERAL_LOGGING_LEVEL
+
+      - CORE_CHAINCODE_LOGGING_LEVEL=$GENERAL_LOGGING_LEVEL
+      - CORE_CHAINCODE_LOGGING_SHIM=$GENERAL_LOGGING_LEVEL
+
+      - CORE_PEER_ENDORSER_ENABLED=true
+      - CORE_PEER_FILESYSTEMPATH=/var/hyperledger/peer
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      # The following setting skips the gossip handshake since we are are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_PROFILE_ENABLED=true
+
+      - CORE_PEER_TLS_ENABLED=$TLS_ENABLED
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
+      # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
+
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers -- NOTE: This has to match the network name printed
+      # when `docker-compose up` is run; e.g.
+      #     Creating network "FabricWebApp_default" with the default driver
+      # See https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_default
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start --peer-defaultchain=false
+    volumes:
+        - /var/run/:/host/var/run/

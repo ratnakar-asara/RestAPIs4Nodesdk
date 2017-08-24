@@ -1,0 +1,46 @@
+version: '2'
+
+volumes:
+    # Really there should be one generated_artifacts__volume for each org, because each org should keep its root CA data secret.
+    generated_artifacts__volume:
+
+services:
+
+    # TODO: Make a volume for the root CA(s), which can be taken offline and secured.  Meaning that the initialization
+    # done in this docker-compose file should be done offline (i.e. on an air-gapped computer).
+
+    # TODO: Use synchronizer.py and chain these all together so they can manage their own dependencies
+
+    # TODO: This is where the root CA cert/key would be used, and it wouldn't make it onto any publicly accessible server.
+    # See https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html
+    crypto_config:
+        image: hyperledger/fabric-ca:x86_64-1.0.1
+        volumes:
+            - ../source-artifacts:/source-artifacts:ro
+            - generated_artifacts__volume:/generated-artifacts:rw
+        command: |
+            bash -cx "
+                cd /generated-artifacts
+                /source-artifacts/fabric-ca-cryptogen.sh
+            "
+
+    # TODO: Figure out how to combine fabric-ca and fabric-tools docker images so only one service is needed (this service
+    # could then be subsumed by crypto_config into a generate_artifacts service)
+    # NOTE: The hyperlegder/fabric-tools:x86_64-1.0.1 image has an associated anonymous volume which will be
+    # automatically created (it has a hash as a name, which is pretty unhelpful), which will persist unless
+    # that volume is removed via `docker-compose -f <path-to-this-file> rm -v`.  Note that the
+    # `docker-compose rm -v` command only removes anonymous volumes.
+    channel_config:
+        image: hyperledger/fabric-tools:x86_64-1.0.1
+        volumes:
+            - ../source-artifacts:/source-artifacts:ro
+            - generated_artifacts__volume:/generated-artifacts:rw
+        environment:
+            - FABRIC_CFG_PATH=/source-artifacts
+        command: |
+            bash -cx "
+                cd /source-artifacts
+                configtxgen -profile TwoOrgsChannel -outputCreateChannelTx /generated-artifacts/mychannel.tx -channelID mychannel
+                configtxgen -profile TwoOrgsOrdererGenesis -outputBlock /generated-artifacts/orderer.genesis.block
+            "
+                #configtxgen -profile TwoOrgsOrdererGenesis -channelID mychannel -inspectBlock /generated-artifacts/orderer.genesis.block

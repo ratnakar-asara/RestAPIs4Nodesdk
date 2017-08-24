@@ -1,0 +1,21 @@
+version: '2'
+
+volumes:
+    build_chaincode_volume:
+
+services:
+    # This service builds the chaincode, and can be used to only compile the chaincode without
+    # running the rest of the services.
+    build_chaincode:
+        container_name: build_chaincode
+        image: hyperledger/fabric-ccenv:x86_64-1.0.0
+        volumes:
+            # Persist build state so that the whole project doesn't have to be built each time.
+            - build_chaincode_volume:/opt/gopath:rw
+            # Mount this project's files
+            - ../chaincode/gopath/src/github.com/example_cc:/opt/gopath/src/github.com/example_cc:ro
+        command: |
+            bash -x -c "
+                find $$GOPATH/src/github.com/example_cc
+                time go install github.com/example_cc
+            "

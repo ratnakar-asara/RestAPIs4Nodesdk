@@ -1,0 +1,188 @@
+version: '2'
+
+volumes:
+  com_example_org0_ca__volume:
+  com_example_org0_peer0__volume:
+  com_example_org0_peer1__volume:
+
+  com_example_org1_ca__volume:
+  com_example_org1_peer0__volume:
+  com_example_org1_peer1__volume:
+
+  #com_example_org2_ca__volume:
+  com_example_org2_orderer__volume:
+
+  com_example_www__config_volume:
+  com_example_www__home_volume:
+  com_example_www__node_modules_volume:
+
+services:
+
+  ca.org0.example.com:
+    container_name: ca.org0.example.com
+    extends:
+      file: docker/ca-base.yaml
+      service: ca-base
+    volumes:
+      # This is the persistent storage volume for the CA.
+      - com_example_org0_ca__volume:/var/hyperledger/ca:rw
+    # This is not necessary -- just a little self-documenting hint that this service is being offered on port 7054
+    ports:
+      - 7054:7054
+
+  ca.org1.example.com:
+    container_name: ca.org1.example.com
+    extends:
+      file: docker/ca-base.yaml
+      service: ca-base
+    volumes:
+      # This is the persistent storage volume for the CA.
+      - com_example_org0_ca__volume:/var/hyperledger/ca:rw
+    # This is really only necessary if you want to access this service from the host.
+    # Configurations within these docker-compose services should just use the native port 7054 (since
+    # each service has its own IP address).  In particular, within the docker services, this
+    # service is available on address ca.org1.example.com:7054
+    ports:
+      - 8054:7054
+
+  orderer.org2.example.com:
+    container_name: orderer.org2.example.com
+    image: hyperledger/fabric-orderer:x86_64-1.0.1
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/orderer
+      - ORDERER_GENERAL_LOGLEVEL=$GENERAL_LOGGING_LEVEL
+      - ORDERER_MSP_LOGLEVEL=DEBUG
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=Org2MSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+
+      - ORDERER_GENERAL_TLS_ENABLED=$TLS_ENABLED
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - com_example_org2_orderer__volume:/var/hyperledger/orderer:rw
+    ports:
+      - 7050:7050
+
+  peer0.org0.example.com:
+    container_name: peer0.org0.example.com
+    extends:
+      file: docker/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_LOGGING_LEVEL=$GENERAL_LOGGING_LEVEL
+      - CORE_PEER_ID=peer0.org0.example.com
+      - CORE_PEER_ADDRESS=peer0.org0.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org0.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org0MSP
+    volumes:
+      - com_example_org0_peer0__volume:/var/hyperledger/peer:rw
+    ports:
+      - 7051:7051
+      - 7053:7053
+
+  peer1.org0.example.com:
+    container_name: peer1.org0.example.com
+    extends:
+      file: docker/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_LOGGING_LEVEL=$GENERAL_LOGGING_LEVEL
+      - CORE_PEER_ID=peer1.org0.example.com
+      - CORE_PEER_ADDRESS=peer1.org0.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org0.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org0MSP
+    volumes:
+      - com_example_org0_peer1__volume:/var/hyperledger/peer:rw
+    # This is really only necessary if you want to access this service from the host.
+    # Configurations within these docker-compose services should just use the native ports (since
+    # each service has its own IP address).  In particular, within the docker services, this
+    # service is available on address peer1.org0.example.com:7051 (and 7053)
+    ports:
+      - 7056:7051
+      - 7058:7053
+
+  peer0.org1.example.com:
+    container_name: peer0.org1.example.com
+    extends:
+      file: docker/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.org1.example.com
+      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    volumes:
+      - com_example_org1_peer0__volume:/var/hyperledger/peer:rw
+    # This is really only necessary if you want to access this service from the host.
+    # Configurations within these docker-compose services should just use the native ports (since
+    # each service has its own IP address).  In particular, within the docker services, this
+    # service is available on address peer0.org1.example.com:7051 (and 7053)
+    ports:
+      - 8051:7051
+      - 8053:7053
+
+  peer1.org1.example.com:
+    container_name: peer1.org1.example.com
+    extends:
+      file: docker/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_LOGGING_LEVEL=$GENERAL_LOGGING_LEVEL
+      - CORE_PEER_ID=peer1.org1.example.com
+      - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    volumes:
+      - com_example_org1_peer1__volume:/var/hyperledger/peer:rw
+    # This is really only necessary if you want to access this service from the host.
+    # Configurations within these docker-compose services should just use the native ports (since
+    # each service has its own IP address).  In particular, within the docker services, this
+    # service is available on address peer1.org1.example.com:7051 (and 7053)
+    ports:
+      - 8056:7051
+      - 8058:7053
+
+  webserver:
+    container_name: www.example.com
+    image: hyperledger/fabric-baseimage:x86_64-0.3.0
+    working_dir: /var/hyperledger/www
+    environment:
+      # This is what enables full debug output in the fabric-sdk-node modules.
+      - 'HFC_LOGGING={"debug":"console"}'
+      ## This uses the level specified by the GENERAL_LOGGING_LEVEL env var.
+      #- 'HFC_LOGGING={"$GENERAL_LOGGING_LEVEL":"console"}'
+      - TLS_ENABLED=$TLS_ENABLED
+    command: |
+      bash -x -c "
+        cp ${COMPOSE_PROJECT_NAME}/web/server/package.json . && \
+        npm install && \
+        cd ${COMPOSE_PROJECT_NAME}/web/server && \
+        npm start
+      "
+        #npm test
+    ports:
+      - 3000:3000
+    volumes:
+      # This is to contain and persist the webserver keystore
+      - com_example_www__home_volume:/var/hyperledger/www:rw
+      # This is to contain and persist node_modules
+      - com_example_www__node_modules_volume:/var/hyperledger/www/node_modules:rw
+      # Mount the volume with config/crypto materials (this probably has to be mounted after /var/hyperledger/www)
+      - com_example_www__config_volume:/var/hyperledger/www/config:ro
+      # Mount this project's files.  TODO: Mount only the minimal necessary files (move necessary certs to under web/server)
+      - .:/var/hyperledger/www/${COMPOSE_PROJECT_NAME}:ro
+    depends_on:
+      - ca.org0.example.com
+      - ca.org1.example.com
+      - orderer.org2.example.com
+      - peer0.org0.example.com
+      - peer1.org0.example.com
+      - peer0.org1.example.com
+      - peer1.org1.example.com

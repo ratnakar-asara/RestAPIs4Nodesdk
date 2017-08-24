@@ -1,0 +1,25 @@
+{
+  "name": "FabricWebApp",
+  "version": "0.0.1",
+  "description": "An end-to-end demonstration app using Hyperledger Fabric.",
+  "scripts": {
+    "start": "DEBUG=hfc node app.js",
+    "test": "DEBUG=hfc node test.js"
+  },
+  "keywords": [
+    "fabric-client sample app",
+    "balance-transfer node sample",
+    "v1.0 fabric nodesdk sample"
+  ],
+  "engines": {
+    "node": ">=6.9.1",
+    "npm": ">=3.10.10"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.15.2",
+    "fabric-ca-client": "1.0.1",
+    "fabric-client": "1.0.1",
+    "winston": "^2.2.0"
+  }
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head>
+    <meta charset='utf-8'>
+    <title>FabricWebApp - Hyperledger Fabric 1.0 Demo Web App</title>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js'></script>
+    <script src='client.js'></script>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body ng-app='app' ng-controller='controller'>
+    <div class='horizontal-layout' style='height:100vh; width:100vw'>
+        <div class='vertical-layout' style='width:50vw'>
+            <div class='horizontal-layout'>
+                <input type='text' ng-model='input_account_name' style='flex-grow:0' placeholder='Account Name'>
+                <button ng-click='switch_to_account(input_account_name)' style='flex-grow:1'>Switch To Account</button>
+            </div>
+            <br>
+            <div class='vertical-layout'>
+                <account-panel id='account_panel' context='null'></account-panel>
+            </div>
+        </div>
+        <div class='vertical-layout' style='flex-grow:1'>
+            <span style='flex-grow:0'>Event Log</span>
+            <textarea style='flex-grow:1' id='log_textarea' readonly ng-model='log_content'>placeholder text</textarea>
+        </div>
+    </div>
+</body>
